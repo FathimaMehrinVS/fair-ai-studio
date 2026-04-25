@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FairAI Studio — Bias Audit & Mitigation Dashboard</title>
+  <meta name="description"
+    content="An interactive AI fairness dashboard to detect, audit, and mitigate bias in ML recruitment models using Disparate Impact, SHAP, and re-weighting techniques." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+
+  <!-- ───── SIDEBAR ───── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚖️</div>
+      <div>
+        <div class="brand-name">FairAI Studio</div>
+
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#overview" class="nav-item active" id="nav-overview">
+        <span class="nav-icon">🏠</span><span class="nav-label">Overview</span>
+      </a>
+      <a href="#audit" class="nav-item" id="nav-audit">
+        <span class="nav-icon">🔬</span><span class="nav-label">Bias Audit</span>
+      </a>
+      <a href="#mitigation" class="nav-item" id="nav-mitigation">
+        <span class="nav-icon">🛠️</span><span class="nav-label">Mitigation</span>
+      </a>
+      <a href="#explainability" class="nav-item" id="nav-explainability">
+        <span class="nav-icon">🧠</span><span class="nav-label">Explainability</span>
+      </a>
+      <a href="#data" class="nav-item" id="nav-data">
+        <span class="nav-icon">📊</span><span class="nav-label">Dataset</span>
+      </a>
+      <a href="#predict" class="nav-item" id="nav-predict">
+        <span class="nav-icon">🎯</span><span class="nav-label">Live Predict</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-dot active"></div>
+      <span>Models Loaded</span>
+    </div>
+  </aside>
+
+  <!-- ───── MAIN ───── -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">Bias Audit & Fairness Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="pill pill-green">✓ Fair Model Active</div>
+      </div>
+    </header>
+
+    <!-- ══════════ SECTION: OVERVIEW ══════════ -->
+    <section id="overview" class="section active-section">
+      <div class="section-header">
+        <h2 class="section-title">🏠 Overview</h2>
+        <p class="section-sub">Key fairness metrics and model performance at a glance.</p>
+      </div>
+
+      <!-- Hero KPI Cards -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card loading" id="kpi-improvement">
+          <div class="kpi-icon">🚀</div>
+          <div class="kpi-value" id="kv-improvement">—</div>
+          <div class="kpi-label">Fairness Improvement</div>
+          <div class="kpi-sub">Disparate Impact gap reduction</div>
+        </div>
+        <div class="kpi-card loading" id="kpi-accuracy">
+          <div class="kpi-icon">🎯</div>
+          <div class="kpi-value" id="kv-accuracy">—</div>
+          <div class="kpi-label">Fair Model Accuracy</div>
+          <div class="kpi-sub">vs Biased: <span id="kv-accuracy-biased">—</span></div>
+        </div>
+        <div class="kpi-card loading" id="kpi-di">
+          <div class="kpi-icon">⚖️</div>
+          <div class="kpi-value" id="kv-di">—</div>
+          <div class="kpi-label">Disparate Impact (Fair)</div>
+          <div class="kpi-sub">Ideal: 1.0 · Was: <span id="kv-di-biased">—</span></div>
+        </div>
+        <div class="kpi-card loading" id="kpi-spd">
+          <div class="kpi-icon">📐</div>
+          <div class="kpi-value" id="kv-spd">—</div>
+          <div class="kpi-label">Stat. Parity Diff (Fair)</div>
+          <div class="kpi-sub">Ideal: 0.0 · Was: <span id="kv-spd-biased">—</span></div>
+        </div>
+      </div>
+
+
+
+      <!-- Gauge Row -->
+      <div class="gauges-row">
+        <div class="chart-card half">
+          <h3 class="card-title">Disparate Impact — Biased Model</h3>
+          <div class="chart-wrap" id="gauge-di-biased">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="chart-card half">
+          <h3 class="card-title">Disparate Impact — Fair Model</h3>
+          <div class="chart-wrap" id="gauge-di-fair">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="chart-card half">
+          <h3 class="card-title">Stat. Parity Diff — Biased</h3>
+          <div class="chart-wrap" id="gauge-spd-biased">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="chart-card half">
+          <h3 class="card-title">Stat. Parity Diff — Fair</h3>
+          <div class="chart-wrap" id="gauge-spd-fair">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Why We Built This -->
+      <div class="improvement-banner" style="margin-top: 8px;">
+        <div class="ib-icon">🌍</div>
+        <div class="ib-content" style="flex: 1;">
+          <div class="ib-label" style="font-size: 13px; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Why We Built This</div>
+          <div style="font-size: 15px; line-height: 1.6; color: var(--text);">
+            Artificial Intelligence in recruitment holds the promise of true meritocracy—but only if we actively prevent it from inheriting human biases. 
+            We built <strong>FairAI Studio</strong> to demonstrate that bias detection and mitigation shouldn't be an opaque process. 
+            By providing a transparent, interactive dashboard that visualizes the direct impact of fairness algorithms, 
+            we empower teams to build models that evaluate candidates purely on merit, eliminating demographic disadvantages.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: BIAS AUDIT ══════════ -->
+    <section id="audit" class="section">
+      <div class="section-header">
+        <h2 class="section-title">🔬 Bias Audit Report</h2>
+        <p class="section-sub">Forensic analysis by Member 2 — mathematical proof of bias using fairness metrics.</p>
+      </div>
+
+      <div class="metrics-table-card">
+        <h3 class="card-title">📋 Fairness Metric Deep-Dive</h3>
+        <table class="metrics-table" id="metrics-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Biased Model</th>
+              <th>Fair Model</th>
+              <th>Ideal</th>
+              <th>Status</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody id="metrics-tbody">
+            <tr>
+              <td colspan="6" class="loading-cell">
+                <div class="spinner"></div> Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="two-col">
+        <div class="chart-card">
+          <h3 class="card-title">📊 Selection Rates by Gender</h3>
+          <div class="chart-wrap chart-tall" id="chart-selection-rates">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="info-card">
+          <h3 class="card-title">📖 Metric Glossary</h3>
+          <div class="glossary">
+            <div class="glossary-item">
+              <div class="glossary-term">Disparate Impact (DI)</div>
+              <div class="glossary-def">Ratio of selection rates between groups. <strong>Ideal = 1.0</strong>. Values
+                below 0.8 indicate legal discrimination (4/5ths rule).</div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-term">Statistical Parity Difference</div>
+              <div class="glossary-def">Arithmetic difference in selection rates. <strong>Ideal = 0.0</strong>. Negative
+                = privileged group selected more.</div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-term">Equal Opportunity Difference</div>
+              <div class="glossary-def">Difference in True Positive Rates. <strong>Ideal = 0.0</strong>. Measures if
+                qualified candidates are treated equally.</div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-term">Sensitive Feature</div>
+              <div class="glossary-def">Gender (0 = Female / Unprivileged, 1 = Male / Privileged). Bias is measured
+                across this dimension.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: MITIGATION ══════════ -->
+    <section id="mitigation" class="section">
+      <div class="section-header">
+        <h2 class="section-title">🛠️ Bias Mitigation Results</h2>
+        <p class="section-sub">Member 3's two-stage fix: Re-weighting (pre-processing) + Threshold Calibration
+          (post-processing).</p>
+      </div>
+
+      <div class="improvement-banner" id="improvement-banner">
+        <div class="ib-icon">🏆</div>
+        <div class="ib-content">
+          <div class="ib-value" id="ib-score">—</div>
+          <div class="ib-label">Overall Fairness Improvement Score</div>
+        </div>
+        <div class="ib-stages">
+          <div class="ib-stage">
+            <div class="ib-stage-num">Stage 1</div>
+            <div class="ib-stage-name">Re-weighting</div>
+            <div class="ib-stage-desc">Pre-processing: balanced training sample weights</div>
+          </div>
+          <div class="ib-divider">+</div>
+          <div class="ib-stage">
+            <div class="ib-stage-num">Stage 2</div>
+            <div class="ib-stage-name">Threshold Calibration</div>
+            <div class="ib-stage-desc">Post-processing: group-specific decision thresholds</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="card-title">⚖️ Fairness Metrics: Before vs After</h3>
+        <div class="chart-wrap chart-wide" id="chart-metrics-comparison">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="stat-card">
+          <h3 class="card-title">🤖 Biased Model Stats</h3>
+          <div class="stat-rows" id="biased-stats">
+            <div class="stat-row"><span>Accuracy</span><span id="biased-acc">—</span></div>
+            <div class="stat-row"><span>F1-Score</span><span id="biased-f1">—</span></div>
+            <div class="stat-row"><span>Disparate Impact</span><span id="biased-di">—</span></div>
+            <div class="stat-row"><span>Stat. Parity Diff</span><span id="biased-spd">—</span></div>
+            <div class="stat-row"><span>Eq. Opp. Diff</span><span id="biased-eod">—</span></div>
+          </div>
+        </div>
+        <div class="stat-card highlight">
+          <h3 class="card-title">✅ Fair Model Stats</h3>
+          <div class="stat-rows" id="fair-stats">
+            <div class="stat-row"><span>Accuracy</span><span id="fair-acc">—</span></div>
+            <div class="stat-row"><span>F1-Score</span><span id="fair-f1">—</span></div>
+            <div class="stat-row"><span>Disparate Impact</span><span id="fair-di">—</span></div>
+            <div class="stat-row"><span>Stat. Parity Diff</span><span id="fair-spd">—</span></div>
+            <div class="stat-row"><span>Eq. Opp. Diff</span><span id="fair-eod">—</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: EXPLAINABILITY ══════════ -->
+    <section id="explainability" class="section">
+      <div class="section-header">
+        <h2 class="section-title">🧠 Explainable AI (XAI)</h2>
+        <p class="section-sub">SHAP values reveal what the model really learned. Is it using skills or shortcuts?</p>
+      </div>
+
+      <div class="two-col">
+        <div class="chart-card">
+          <h3 class="card-title">🔍 SHAP Summary Plot (Biased Model)</h3>
+          <p class="card-sub">Generated by Member 2 — shows feature impact direction and magnitude.</p>
+          <div class="chart-wrap chart-tall" id="chart-shap">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3 class="card-title">📊 Feature Importance Ranking</h3>
+          <p class="card-sub">Relative contribution of each feature to predictions.</p>
+          <div class="chart-wrap chart-tall" id="chart-feature-importance">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="xai-insight-card">
+        <h3 class="card-title">💡 Key Insights</h3>
+        <div class="insight-grid">
+          <div class="insight-item">
+            <div class="insight-icon">🎯</div>
+            <div class="insight-content">
+              <div class="insight-title">Screening Score Dominates</div>
+              <div class="insight-body">42.4% importance — the most powerful predictor, which is merit-based and
+                appropriate.</div>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-icon">⚠️</div>
+            <div class="insight-content">
+              <div class="insight-title">Gender Has Influence</div>
+              <div class="insight-body">4.0% importance — small but present. Even marginal gender influence compounds to
+                systemic bias at scale.</div>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-icon">✅</div>
+            <div class="insight-content">
+              <div class="insight-title">Experience is Key</div>
+              <div class="insight-body">21.6% importance — legitimate merit factor. Good that it ranks above gender.
+              </div>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-icon">🔧</div>
+            <div class="insight-content">
+              <div class="insight-title">Mitigation Target</div>
+              <div class="insight-body">Re-weighting effectively suppresses gender's correlation with outcome while
+                preserving legitimate signals.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: DATASET ══════════ -->
+    <section id="data" class="section">
+      <div class="section-header">
+        <h2 class="section-title">📊 Dataset Explorer</h2>
+        <p class="section-sub">Understand the data that trains the model — built on Member 1's cleaned dataset.</p>
+      </div>
+
+      <div class="kpi-grid" id="data-kpis">
+        <div class="kpi-card">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-value" id="ds-total">2000</div>
+          <div class="kpi-label">Total Candidates</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">♂️</div>
+          <div class="kpi-value" id="ds-male">—</div>
+          <div class="kpi-label">Male Candidates</div>
+          <div class="kpi-sub">Shortlist rate: <span id="ds-male-rate">—</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">♀️</div>
+          <div class="kpi-value" id="ds-female">—</div>
+          <div class="kpi-label">Female Candidates</div>
+          <div class="kpi-sub">Shortlist rate: <span id="ds-female-rate">—</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-value">5</div>
+          <div class="kpi-label">Features</div>
+          <div class="kpi-sub">1 sensitive (gender)</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="info-card">
+          <h3 class="card-title">📈 Feature Statistics</h3>
+          <table class="feat-table" id="feat-stats-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Mean</th>
+                <th>Min</th>
+                <th>Max</th>
+              </tr>
+            </thead>
+            <tbody id="feat-stats-body">
+              <tr>
+                <td colspan="4" class="loading-cell">
+                  <div class="spinner"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="info-card">
+          <h3 class="card-title">🎓 Education Level Distribution</h3>
+          <div class="edu-bars" id="edu-bars">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card full">
+        <h3 class="card-title">📈 Feature Distributions by Gender</h3>
+        <p class="card-sub">Age, Experience Years, and Screening Score — split by gender to reveal imbalances in the raw dataset.</p>
+        <div class="chart-wrap chart-tall" id="chart-distributions">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: LIVE PREDICT ══════════ -->
+    <section id="predict" class="section">
+      <div class="section-header">
+        <h2 class="section-title">🎯 Live Candidate Predictor</h2>
+        <p class="section-sub">Submit a candidate profile and see how both models respond — spot bias in real time.</p>
+      </div>
+
+      <div class="predict-layout">
+        <div class="predict-form-card">
+          <h3 class="card-title" style="margin-bottom:20px">📝 Candidate Profile</h3>
+          <form id="predict-form" autocomplete="off">
+            <div class="form-section-title">Demographics</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-gender">Gender</label>
+                <select id="input-gender" class="form-control">
+                  <option value="0">Female (0)</option>
+                  <option value="1" selected>Male (1)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-edu">Education</label>
+                <select id="input-edu" class="form-control">
+                  <option value="0">Level 0 – Basic</option>
+                  <option value="1">Level 1 – Diploma</option>
+                  <option value="2" selected>Level 2 – Bachelor's</option>
+                  <option value="3">Level 3 – Master's</option>
+                  <option value="4">Level 4 – PhD</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section-title">Skills & Experience</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-age">Age <span class="range-val" id="age-val">30</span></label>
+                <input type="range" id="input-age" min="20" max="60" value="30" class="form-range" />
+              </div>
+              <div class="form-group">
+                <label for="input-exp">Exp. Years <span class="range-val" id="exp-val">5</span></label>
+                <input type="range" id="input-exp" min="0" max="30" value="5" class="form-range" />
+              </div>
+              <div class="form-group full-width">
+                <label for="input-score">Screening Score <span class="range-val" id="score-val">65.0</span></label>
+                <input type="range" id="input-score" min="20" max="100" value="65" step="0.5" class="form-range" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-predict" id="btn-predict">
+              ⚡ Run Prediction
+            </button>
+          </form>
+        </div>
+
+        <div class="predict-results-card" id="predict-results">
+          <h3 class="card-title">📊 Prediction Results</h3>
+          <div class="predict-placeholder" id="predict-placeholder">
+            <div class="predict-icon">🎯</div>
+            <p>Fill in the candidate profile and click <strong>Run Prediction</strong> to see both models' decisions.
+            </p>
+          </div>
+          <div class="predict-output hidden" id="predict-output">
+            <div class="model-verdict" id="predict-verdict"></div>
+            <div class="model-cards">
+              <div class="model-card" id="mc-biased">
+                <div class="mc-label">🤖 Biased Model</div>
+                <div class="mc-pred" id="mc-biased-pred">—</div>
+                <div class="mc-prob-wrap">
+                  <div class="mc-prob-label">Shortlist Probability</div>
+                  <div class="mc-prob-bar-track">
+                    <div class="mc-prob-bar" id="mc-biased-bar"></div>
+                  </div>
+                  <div class="mc-prob-val" id="mc-biased-prob">—</div>
+                </div>
+              </div>
+              <div class="model-card fair" id="mc-fair">
+                <div class="mc-label">✅ Fair Model</div>
+                <div class="mc-pred" id="mc-fair-pred">—</div>
+                <div class="mc-prob-wrap">
+                  <div class="mc-prob-label">Shortlist Probability</div>
+                  <div class="mc-prob-bar-track">
+                    <div class="mc-prob-bar" id="mc-fair-bar"></div>
+                  </div>
+                  <div class="mc-prob-val" id="mc-fair-prob">—</div>
+                </div>
+              </div>
+            </div>
+            <div class="bias-alert" id="bias-alert"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-scenarios">
+        <h3 class="card-title">⚡ Quick Test Scenarios</h3>
+        <div class="scenario-grid">
+          <button class="scenario-btn" onclick="loadScenario(1,56,2,30,76.8)">
+            <div class="sc-title">🌟 Clear Accept (Male)</div>
+            <div class="sc-sub">Age:56 · Edu:2 · Exp:30 · Score:76.8</div>
+          </button>
+          <button class="scenario-btn" onclick="loadScenario(1,49,2,29,61.4)">
+            <div class="sc-title">📉 Demoted (Male)</div>
+            <div class="sc-sub">Age:49 · Edu:2 · Exp:29 · Score:61.4</div>
+          </button>
+          <button class="scenario-btn" onclick="loadScenario(0,41,2,19,79.3)">
+            <div class="sc-title">🛡️ Rescued (Female)</div>
+            <div class="sc-sub">Age:41 · Edu:2 · Exp:19 · Score:79.3</div>
+          </button>
+          <button class="scenario-btn" onclick="loadScenario(0,28,0,5,40.0)">
+            <div class="sc-title">❌ Clear Reject (Female)</div>
+            <div class="sc-sub">Age:28 · Edu:0 · Exp:5 · Score:40.0</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{
+    "biased_model": {
+        "accuracy": 0.912,
+        "f1_score": 0.8877551020408163,
+        "fairness_metrics": {
+            "selection_rate_privileged": 0.3631889763779528,
+            "selection_rate_unprivileged": 0.40040650406504064,
+            "disparate_impact": 1.102474276775288,
+            "statistical_parity_difference": 0.03721752768708786,
+            "equal_opportunity_difference": 0.015203182722364317
+        }
+    },
+    "fair_model": {
+        "accuracy": 0.9825,
+        "f1_score": 0.978328173374613,
+        "fairness_metrics": {
+            "selection_rate_privileged": 0.4045275590551181,
+            "selection_rate_unprivileged": 0.4054878048780488,
+            "disparate_impact": 1.002373746365201,
+            "statistical_parity_difference": 0.0009602458229306943,
+            "equal_opportunity_difference": -0.036231884057971064
+        },
+        "thresholds": {
+            "0": 0.66,
+            "1": 0.29
+        }
+    },
+    "improvement_score_pct": 97.68356855993603
+}

@@ -465,7 +465,7 @@ async function generateSmartReport() {
     const result = await res.json();
 
     if (result.error) {
-      content.innerHTML = `<span style="color:var(--orange)">⚠️ ${result.error}. Verify <code>GEMINI_API_KEY</code> in .env.</span>`;
+      content.innerHTML = `<span style="color:var(--orange)">⚠️ AI Error: ${result.error}.<br/><small>Make sure GEMINI_API_KEY is set in Render Dashboard.</small></span>`;
       btn.textContent = '📊 Retry Audit';
       btn.disabled = false;
     } else {
@@ -478,7 +478,7 @@ async function generateSmartReport() {
           i++;
           setTimeout(type, 20);
         } else {
-          btn.textContent = '🔄 Regenerate (Gemini 1.5)';
+          btn.textContent = '🔄 Regenerate (Gemini 2.0)';
           btn.disabled = false;
         }
       };

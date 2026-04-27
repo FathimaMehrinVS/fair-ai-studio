@@ -10,5 +10,5 @@ seaborn
 python-multipart
 python-dotenv
 requests
-google-generativeai
+google-genai
 python-dotenv

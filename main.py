@@ -24,7 +24,7 @@ from scipy.stats import gaussian_kde
 import functools
 from pathlib import Path
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 
 load_dotenv()
 
@@ -35,8 +35,10 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Configure Gemini if key exists
+client = None
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+    client = genai.Client(api_key=GEMINI_API_KEY)
+
 app = FastAPI(title="FairAI Studio API", version="1.0.0")
 
 app.add_middleware(
@@ -542,25 +544,25 @@ async def get_hf_token():
 
 @app.post("/api/ai/insight")
 async def get_gemini_insight(data: dict):
-    if not GEMINI_API_KEY:
+    if not client:
         return {"error": "Gemini API Key not configured"}
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        # Technical context for the AI
-        prompt = f"""
-        You are a recruitment fairness auditor part of the FairAI Studio. 
-        Analyze these metrics from a bias audit:
-        - Mitigated Disparate Impact: {data.get('di')}
-        - Fairness Improvement: {data.get('improvement')}%
-        - Initial Biased DI: {data.get('initial_di')}
-        
-        Provide one punchy, professional, and actionable recruitment recommendation. 
-        Focus on how the mitigation (improvement) helps the company's hiring ethics.
-        Limit to 1 to 2 sentences max. Keep it sophisticated.
-        """
-        response = model.generate_content(prompt)
-        return {"insight": response.text.strip()}
+        # Using state-of-the-art Gemini 2.0 Flash
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"""
+            Analyze these recruitment fairness metrics from FairAI Studio:
+            - Mitigated Disparate Impact: {data.get('di')}
+            - Fairness Improvement: {data.get('improvement')}%
+            - Initial Biased DI: {data.get('initial_di')}
+            
+            Provide one punchy, professional, and actionable recruitment recommendation. 
+            Focus on how the mitigation helps the company's hiring ethics.
+            Limit to 1 to 2 sentences max. Keep it sophisticated.
+            """
+        )
+        return {"insight": response.text.strip() if response.text else "Insight generation complete."}
     except Exception as e:
         return {"error": str(e)}
 

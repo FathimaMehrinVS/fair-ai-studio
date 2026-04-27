@@ -462,6 +462,14 @@ async function generateSmartReport() {
       body: JSON.stringify(payload)
     });
 
+    if (!res.ok) {
+      const errText = await res.text();
+      content.innerHTML = `<span style="color:var(--orange)">⚠️ HTTP ${res.status}: ${res.statusText}. <br/><small>${errText.substring(0, 100)}</small></span>`;
+      btn.textContent = '📊 Retry Audit';
+      btn.disabled = false;
+      return;
+    }
+
     const result = await res.json();
 
     if (result.error) {

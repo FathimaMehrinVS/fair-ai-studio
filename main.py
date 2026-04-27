@@ -22,9 +22,21 @@ import seaborn as sns
 from pathlib import Path
 from scipy.stats import gaussian_kde
 import functools
+from pathlib import Path
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).parent
 
+# Existing configs
+HF_TOKEN = os.getenv("HF_TOKEN")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Configure Gemini if key exists
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 app = FastAPI(title="FairAI Studio API", version="1.0.0")
 
 app.add_middleware(
@@ -77,6 +89,9 @@ def calculate_fairness_metrics(df, prediction_col, sensitive_feature="gender", t
         "statistical_parity_difference": float(spd),
         "equal_opportunity_difference": float(eod),
     }
+
+
+
 
 
 # ─── Chart generators ────────────────────────────────────────────────────────
@@ -519,3 +534,36 @@ async def get_dataset_stats():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/config/hf_token")
+async def get_hf_token():
+    """Returns the HF_TOKEN for client-side gated model access (Edge AI)."""
+    return {"token": HF_TOKEN or ""}
+
+@app.post("/api/ai/insight")
+async def get_gemini_insight(data: dict):
+    if not GEMINI_API_KEY:
+        return {"error": "Gemini API Key not configured"}
+    
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Technical context for the AI
+        prompt = f"""
+        You are a recruitment fairness auditor part of the FairAI Studio. 
+        Analyze these metrics from a bias audit:
+        - Mitigated Disparate Impact: {data.get('di')}
+        - Fairness Improvement: {data.get('improvement')}%
+        - Initial Biased DI: {data.get('initial_di')}
+        
+        Provide one punchy, professional, and actionable recruitment recommendation. 
+        Focus on how the mitigation (improvement) helps the company's hiring ethics.
+        Limit to 1 to 2 sentences max. Keep it sophisticated.
+        """
+        response = model.generate_content(prompt)
+        return {"insight": response.text.strip()}
+    except Exception as e:
+        return {"error": str(e)}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

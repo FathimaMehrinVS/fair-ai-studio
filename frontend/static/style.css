@@ -702,3 +702,52 @@ body {
   .gauges-row { grid-template-columns: 1fr 1fr; }
   .model-cards { grid-template-columns: 1fr; }
 }
+
+/* ══════════ AI INSIGHT BANNER ══════════ */
+.ai-insight-banner {
+  background: linear-gradient(135deg, rgba(112, 0, 255, 0.1) 0%, rgba(0, 240, 255, 0.1) 100%);
+  border: 1px solid rgba(112, 0, 255, 0.3);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  animation: bgPulse 8s infinite alternate;
+}
+@keyframes bgPulse {
+  from { border-color: rgba(112, 0, 255, 0.3); }
+  to   { border-color: rgba(0, 240, 255, 0.3); }
+}
+.ai-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ai-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  min-height: 60px;
+  font-family: 'Inter', sans-serif;
+}
+.btn-ai {
+  align-self: flex-start;
+  padding: 8px 20px;
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-ai:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(232, 28, 255, 0.4); }
+.badge-accent { background: rgba(0, 240, 255, 0.15); color: var(--accent); }

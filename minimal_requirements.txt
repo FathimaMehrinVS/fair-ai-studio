@@ -8,4 +8,7 @@ shap
 matplotlib
 seaborn
 python-multipart
-pydantic
+python-dotenv
+requests
+google-generativeai
+python-dotenv

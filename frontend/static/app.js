@@ -4,6 +4,9 @@
    ═══════════════════════════════════════════ */
 
 const API = '';  // same origin
+let summaryData = null;
+let gaugesLoaded = false;
+let generator = null;
 
 /* ── Utility ── */
 const $ = id => document.getElementById(id);
@@ -14,7 +17,7 @@ const img = (b64) => `<img src="data:image/png;base64,${b64}" alt="chart" style=
 /* ══════════════════════
    1. NAVIGATION
 ══════════════════════ */
-const sections = ['overview','audit','mitigation','explainability','data','predict'];
+const sections = ['overview', 'audit', 'mitigation', 'explainability', 'data', 'predict'];
 
 function activateSection(id) {
   sections.forEach(s => {
@@ -55,9 +58,6 @@ async function fetchJSON(url) {
 /* ══════════════════════
    3. OVERVIEW / SUMMARY
 ══════════════════════ */
-let summaryData = null;
-let gaugesLoaded = false;
-
 async function loadOverview() {
   try {
     summaryData = await fetchJSON('/api/summary');
@@ -67,14 +67,14 @@ async function loadOverview() {
 
     // KPI Cards
     $('kv-improvement').textContent = comparison.improvement_score_pct.toFixed(1) + '%';
-    $('kv-accuracy').textContent    = pct(fm.accuracy);
+    $('kv-accuracy').textContent = pct(fm.accuracy);
     $('kv-accuracy-biased').textContent = pct(bm.accuracy);
-    $('kv-di').textContent          = fmt4(fm.fairness_metrics.disparate_impact);
-    $('kv-di-biased').textContent   = fmt4(audit.disparate_impact);
-    $('kv-spd').textContent         = fmt4(fm.fairness_metrics.statistical_parity_difference);
-    $('kv-spd-biased').textContent  = fmt4(audit.statistical_parity_difference);
+    $('kv-di').textContent = fmt4(fm.fairness_metrics.disparate_impact);
+    $('kv-di-biased').textContent = fmt4(audit.disparate_impact);
+    $('kv-spd').textContent = fmt4(fm.fairness_metrics.statistical_parity_difference);
+    $('kv-spd-biased').textContent = fmt4(audit.statistical_parity_difference);
 
-    ['kpi-improvement','kpi-accuracy','kpi-di','kpi-spd'].forEach(id => {
+    ['kpi-improvement', 'kpi-accuracy', 'kpi-di', 'kpi-spd'].forEach(id => {
       document.getElementById(id).classList.remove('loading');
     });
 
@@ -88,14 +88,14 @@ async function loadGauges() {
   if (gaugesLoaded) return;
   try {
     const gauges = await fetchJSON('/api/charts/gauges');
-    $('gauge-di-biased').innerHTML  = img(gauges.di_biased);
-    $('gauge-di-fair').innerHTML    = img(gauges.di_fair);
+    $('gauge-di-biased').innerHTML = img(gauges.di_biased);
+    $('gauge-di-fair').innerHTML = img(gauges.di_fair);
     $('gauge-spd-biased').innerHTML = img(gauges.spd_biased);
-    $('gauge-spd-fair').innerHTML   = img(gauges.spd_fair);
+    $('gauge-spd-fair').innerHTML = img(gauges.spd_fair);
     gaugesLoaded = true;
   } catch (err) {
     console.error('loadGauges:', err);
-    ['gauge-di-biased','gauge-di-fair','gauge-spd-biased','gauge-spd-fair'].forEach(id => {
+    ['gauge-di-biased', 'gauge-di-fair', 'gauge-spd-biased', 'gauge-spd-fair'].forEach(id => {
       $(id).innerHTML = '<span style="color:var(--text2);font-size:12px;">Chart unavailable</span>';
     });
   }
@@ -154,8 +154,8 @@ async function loadAuditSection() {
     tbody.innerHTML = rows.map(r => {
       // ── Selection rate rows (special rendering) ──
       if (r.isRate) {
-        const bPct  = (r.biasedPct * 100).toFixed(1) + '%';
-        const fPct  = (r.fairPct  * 100).toFixed(1) + '%';
+        const bPct = (r.biasedPct * 100).toFixed(1) + '%';
+        const fPct = (r.fairPct * 100).toFixed(1) + '%';
         const delta = ((r.fairPct - r.biasedPct) * 100).toFixed(2);
         const deltaColor = Math.abs(parseFloat(delta)) < 0.5 ? 'var(--green)' : 'var(--yellow)';
         const deltaStr = parseFloat(delta) >= 0 ? `+${delta}%` : `${delta}%`;
@@ -183,12 +183,12 @@ async function loadAuditSection() {
         : '—';
       const changeStr = change !== '—'
         ? (parseFloat(change) < 0
-            ? `<span style="color:var(--green)">${change}</span>`
-            : `<span style="color:var(--orange)">+${change}</span>`)
+          ? `<span style="color:var(--green)">${change}</span>`
+          : `<span style="color:var(--orange)">+${change}</span>`)
         : '—';
 
       let statusBadge = '—';
-      if (r.better === true)  statusBadge = '<span class="badge badge-green">✓ Improved</span>';
+      if (r.better === true) statusBadge = '<span class="badge badge-green">✓ Improved</span>';
       if (r.better === false) statusBadge = '<span class="badge badge-red">✗ Regressed</span>';
 
       return `<tr>
@@ -228,16 +228,16 @@ async function loadMitigationSection() {
 
     // Stats
     $('biased-acc').textContent = pct(bm.accuracy);
-    $('biased-f1').textContent  = fmt4(bm.f1_score);
-    $('biased-di').textContent  = fmt4(bm.fairness_metrics.disparate_impact);
+    $('biased-f1').textContent = fmt4(bm.f1_score);
+    $('biased-di').textContent = fmt4(bm.fairness_metrics.disparate_impact);
     $('biased-spd').textContent = fmt4(bm.fairness_metrics.statistical_parity_difference);
     $('biased-eod').textContent = fmt4(bm.fairness_metrics.equal_opportunity_difference);
 
-    $('fair-acc').textContent   = pct(fm.accuracy);
-    $('fair-f1').textContent    = fmt4(fm.f1_score);
-    $('fair-di').textContent    = fmt4(fm.fairness_metrics.disparate_impact);
-    $('fair-spd').textContent   = fmt4(fm.fairness_metrics.statistical_parity_difference);
-    $('fair-eod').textContent   = fmt4(fm.fairness_metrics.equal_opportunity_difference);
+    $('fair-acc').textContent = pct(fm.accuracy);
+    $('fair-f1').textContent = fmt4(fm.f1_score);
+    $('fair-di').textContent = fmt4(fm.fairness_metrics.disparate_impact);
+    $('fair-spd').textContent = fmt4(fm.fairness_metrics.statistical_parity_difference);
+    $('fair-eod').textContent = fmt4(fm.fairness_metrics.equal_opportunity_difference);
 
     // Chart
     const chart = await fetchJSON('/api/charts/metrics-comparison');
@@ -278,16 +278,16 @@ async function loadDataSection() {
   try {
     const stats = await fetchJSON('/api/dataset/stats');
 
-    $('ds-total').textContent       = stats.total.toLocaleString();
-    $('ds-male').textContent        = stats.gender_distribution['Male (1)'].toLocaleString();
-    $('ds-female').textContent      = stats.gender_distribution['Female (0)'].toLocaleString();
-    $('ds-male-rate').textContent   = pct(stats.shortlisted_rate_by_gender.Male);
+    $('ds-total').textContent = stats.total.toLocaleString();
+    $('ds-male').textContent = stats.gender_distribution['Male (1)'].toLocaleString();
+    $('ds-female').textContent = stats.gender_distribution['Female (0)'].toLocaleString();
+    $('ds-male-rate').textContent = pct(stats.shortlisted_rate_by_gender.Male);
     $('ds-female-rate').textContent = pct(stats.shortlisted_rate_by_gender.Female);
 
     // Feature stats table
     const feats = [
-      { name: 'Age',             s: stats.age },
-      { name: 'Experience Yrs',  s: stats.experience_years },
+      { name: 'Age', s: stats.age },
+      { name: 'Experience Yrs', s: stats.experience_years },
       { name: 'Screening Score', s: stats.screening_score },
     ];
     $('feat-stats-body').innerHTML = feats.map(f => `<tr>
@@ -305,14 +305,14 @@ async function loadDataSection() {
     };
     const edu = stats.education_distribution;
     const maxEdu = Math.max(...Object.values(edu));
-    $('edu-bars').innerHTML = Object.entries(edu).sort((a,b)=>a[0]-b[0]).map(([k,v]) => `
+    $('edu-bars').innerHTML = Object.entries(edu).sort((a, b) => a[0] - b[0]).map(([k, v]) => `
       <div class="edu-bar-row">
         <div class="edu-bar-label">
           <span>${eduLabels[k] || 'Level ' + k}</span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:11px">${v}</span>
         </div>
         <div class="edu-bar-track">
-          <div class="edu-bar-fill" style="width:${(v/maxEdu*100).toFixed(1)}%"></div>
+          <div class="edu-bar-fill" style="width:${(v / maxEdu * 100).toFixed(1)}%"></div>
         </div>
       </div>
     `).join('');
@@ -348,11 +348,11 @@ $('predict-form').addEventListener('submit', async e => {
   btn.textContent = '⏳ Predicting...';
 
   const data = {
-    gender:           parseInt($('input-gender').value),
-    age:              parseInt($('input-age').value),
-    education_level:  parseInt($('input-edu').value),
+    gender: parseInt($('input-gender').value),
+    age: parseInt($('input-age').value),
+    education_level: parseInt($('input-edu').value),
     experience_years: parseInt($('input-exp').value),
-    screening_score:  parseFloat($('input-score').value),
+    screening_score: parseFloat($('input-score').value),
   };
 
   try {
@@ -414,12 +414,12 @@ function displayPrediction(result) {
 // Quick scenarios
 function loadScenario(gender, age, edu, exp, score) {
   $('input-gender').value = gender;
-  $('input-age').value    = age;
+  $('input-age').value = age;
   $('age-val').textContent = age;
-  $('input-edu').value    = edu;
-  $('input-exp').value    = exp;
+  $('input-edu').value = edu;
+  $('input-exp').value = exp;
   $('exp-val').textContent = exp;
-  $('input-score').value  = score;
+  $('input-score').value = score;
   $('score-val').textContent = score + '.0';
   $('predict-form').dispatchEvent(new Event('submit'));
 }
@@ -430,3 +430,64 @@ function loadScenario(gender, age, edu, exp, score) {
 window.addEventListener('DOMContentLoaded', () => {
   loadOverview();
 });
+
+/* ══════════════════════
+   9. GEMINI POWERED AUDITOR (STABLE)
+   ══════════════════════ */
+async function generateSmartReport() {
+  const btn = $('btn-ai');
+  const content = $('ai-content');
+
+  if (!summaryData) {
+    content.innerHTML = '⚠️ Data not loaded yet. Please refresh the dashboard.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;margin:0 auto;border-top-color:var(--accent)"></div> Consulting Gemini...';
+
+  try {
+    const fm = summaryData.comparison.fair_model;
+    const audit = summaryData.comparison.biased_model;
+
+    const payload = {
+      di: fm.fairness_metrics.disparate_impact.toFixed(3),
+      improvement: summaryData.comparison.improvement_score_pct.toFixed(1),
+      initial_di: audit.disparate_impact.toFixed(3)
+    };
+
+    const res = await fetch('/api/ai/insight', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await res.json();
+
+    if (result.error) {
+      content.innerHTML = `<span style="color:var(--orange)">⚠️ ${result.error}. Verify <code>GEMINI_API_KEY</code> in .env.</span>`;
+      btn.textContent = '📊 Retry Audit';
+      btn.disabled = false;
+    } else {
+      const text = result.insight;
+      content.innerHTML = '';
+      let i = 0;
+      const type = () => {
+        if (i < text.length) {
+          content.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(type, 20);
+        } else {
+          btn.textContent = '🔄 Regenerate (Gemini 1.5)';
+          btn.disabled = false;
+        }
+      };
+      type();
+    }
+  } catch (err) {
+    console.error('Gemini error:', err);
+    content.innerHTML = '⚠️ Connection failed. Check server logs.';
+    btn.disabled = false;
+    btn.textContent = '📊 Retry Audit';
+  }
+}

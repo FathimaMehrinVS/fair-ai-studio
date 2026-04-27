@@ -10,8 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet" />
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 
@@ -132,16 +133,31 @@
         </div>
       </div>
 
+      <!-- ✨ AI Auditor Insights Row -->
+      <div class="ai-insight-banner" id="ai-insight-banner">
+        <div class="ai-label">✨ AI Auditor Insights <span class="badge badge-accent">Gemma 2B</span></div>
+        <div class="ai-content" id="ai-content">
+          Audit results will appear here after loading data.
+        </div>
+        <div id="ai-progress-container" style="display: none;"></div>
+        <button class="btn-ai" onclick="generateSmartReport()" id="btn-ai">📊 View Fairness Report</button>
+      </div>
+
       <!-- Why We Built This -->
       <div class="improvement-banner" style="margin-top: 8px;">
         <div class="ib-icon">🌍</div>
         <div class="ib-content" style="flex: 1;">
-          <div class="ib-label" style="font-size: 13px; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Why We Built This</div>
+          <div class="ib-label"
+            style="font-size: 13px; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">
+            Why We Built This</div>
           <div style="font-size: 15px; line-height: 1.6; color: var(--text);">
-            Artificial Intelligence in recruitment holds the promise of true meritocracy—but only if we actively prevent it from inheriting human biases. 
-            We built <strong>FairAI Studio</strong> to demonstrate that bias detection and mitigation shouldn't be an opaque process. 
-            By providing a transparent, interactive dashboard that visualizes the direct impact of fairness algorithms, 
-            we empower teams to build models that evaluate candidates purely on merit, eliminating demographic disadvantages.
+            Artificial Intelligence in recruitment holds the promise of true meritocracy—but only if we actively prevent
+            it from inheriting human biases.
+            We built <strong>FairAI Studio</strong> to demonstrate that bias detection and mitigation shouldn't be an
+            opaque process.
+            By providing a transparent, interactive dashboard that visualizes the direct impact of fairness algorithms,
+            we empower teams to build models that evaluate candidates purely on merit, eliminating demographic
+            disadvantages.
           </div>
         </div>
       </div>
@@ -399,7 +415,8 @@
 
       <div class="info-card full">
         <h3 class="card-title">📈 Feature Distributions by Gender</h3>
-        <p class="card-sub">Age, Experience Years, and Screening Score — split by gender to reveal imbalances in the raw dataset.</p>
+        <p class="card-sub">Age, Experience Years, and Screening Score — split by gender to reveal imbalances in the raw
+          dataset.</p>
         <div class="chart-wrap chart-tall" id="chart-distributions">
           <div class="spinner"></div>
         </div>

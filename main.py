@@ -548,9 +548,9 @@ async def get_gemini_insight(data: dict):
         return {"error": "Gemini API Key not configured"}
     
     try:
-        # Using state-of-the-art Gemini 2.0 Flash
+        # Using state-of-the-art Gemini 2.5 Flash
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=f"""
             Analyze these recruitment fairness metrics from FairAI Studio:
             - Mitigated Disparate Impact: {data.get('di')}

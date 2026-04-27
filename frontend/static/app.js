@@ -478,7 +478,7 @@ async function generateSmartReport() {
           i++;
           setTimeout(type, 20);
         } else {
-          btn.textContent = '🔄 Regenerate (Gemini 2.0)';
+          btn.textContent = '🔄 Regenerate (Gemini 2.5)';
           btn.disabled = false;
         }
       };

@@ -9,6 +9,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
+import sys
+import os
 import io
 import base64
 import pandas as pd
@@ -40,6 +42,16 @@ if GEMINI_API_KEY:
     client = genai.Client(api_key=GEMINI_API_KEY)
 
 app = FastAPI(title="FairAI Studio API", version="1.0.0")
+
+@app.get("/api/debug/env")
+async def debug_env():
+    """Diagnostic endpoint to verify environment setup."""
+    return {
+        "gemini_key_present": bool(GEMINI_API_KEY),
+        "hf_token_present": bool(HF_TOKEN),
+        "client_initialized": bool(client),
+        "python_version": sys.version,
+    }
 
 app.add_middleware(
     CORSMiddleware,
@@ -564,6 +576,7 @@ async def get_gemini_insight(data: dict):
         )
         return {"insight": response.text.strip() if response.text else "Insight generation complete."}
     except Exception as e:
+        print(f"DEBUG: Gemini Error: {str(e)}")
         return {"error": str(e)}
 
 if __name__ == "__main__":

@@ -46,10 +46,19 @@ app = FastAPI(title="FairAI Studio API", version="1.0.0")
 @app.get("/api/debug/env")
 async def debug_env():
     """Diagnostic endpoint to verify environment setup."""
+    models_available = []
+    if client:
+        try:
+            # Try to list models to see what names the SDK expects
+            for m in client.models.list():
+                models_available.append(m.name)
+        except Exception as e:
+            models_available = [f"Error listing: {str(e)}"]
+
     return {
         "gemini_key_present": bool(GEMINI_API_KEY),
-        "hf_token_present": bool(HF_TOKEN),
         "client_initialized": bool(client),
+        "available_models": models_available[:10], # Just show first 10
         "python_version": sys.version,
     }
 

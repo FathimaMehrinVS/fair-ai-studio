@@ -46,19 +46,9 @@ app = FastAPI(title="FairAI Studio API", version="1.0.0")
 @app.get("/api/debug/env")
 async def debug_env():
     """Diagnostic endpoint to verify environment setup."""
-    models_available = []
-    if client:
-        try:
-            # Try to list models to see what names the SDK expects
-            for m in client.models.list():
-                models_available.append(m.name)
-        except Exception as e:
-            models_available = [f"Error listing: {str(e)}"]
-
     return {
         "gemini_key_present": bool(GEMINI_API_KEY),
         "client_initialized": bool(client),
-        "available_models": models_available[:10], # Just show first 10
         "python_version": sys.version,
     }
 
@@ -569,9 +559,9 @@ async def get_gemini_insight(data: dict):
         return {"error": "Gemini API Key not configured"}
     
     try:
-        # Using rock-solid Gemini 1.5 Flash for stability
+        # Using verified state-of-the-art Gemini 2.5 Flash
         response = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=f"""
             Analyze these recruitment fairness metrics from FairAI Studio:
             - Mitigated Disparate Impact: {data.get('di')}

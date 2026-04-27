@@ -453,7 +453,7 @@ async function generateSmartReport() {
     const payload = {
       di: fm.fairness_metrics.disparate_impact.toFixed(3),
       improvement: summaryData.comparison.improvement_score_pct.toFixed(1),
-      initial_di: audit.disparate_impact.toFixed(3)
+      initial_di: audit.fairness_metrics.disparate_impact.toFixed(3)
     };
 
     const res = await fetch('/api/ai/insight', {

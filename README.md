@@ -1,62 +1,175 @@
-# ⚖️ FairAI Studio
+# ⚖️ FairAI Studio  
+### Empowering Ethical Recruitment through Responsible AI
 
-**FairAI Studio** is a comprehensive tool designed to detect, audit, and mitigate bias in AI-driven recruitment processes. Using advanced Fairness Metrics and Explainable AI (XAI), this platform ensures that machine learning models make decisions based on merit, not demographics.
+FairAI Studio is an end-to-end platform designed to **detect, explain, and mitigate bias in AI-driven recruitment systems**. It transforms traditional “black-box” models into **transparent, fair, and accountable decision-making systems**, ensuring that hiring is based on merit—not demographic attributes.
 
-Built for the **Google GDG Challenge**, this project demonstrates a collaborative approach to Responsible AI.
+Built as part of the **Google Solution Challenge**, this project demonstrates a practical and scalable approach to **Responsible AI**.
 
 ---
 
-## 🚀 Key Features
+## 🌟 Problem Statement
 
-- **🔍 Automated Bias Audit:** Calculate Disparate Impact, Statistical Parity, and Equal Opportunity metrics.
-- **🧠 Explainable AI (XAI):** Leverage SHAP visualizations to understand feature influence (e.g., Experience vs. Gender).
-- **🛠️ Bias Mitigation:** Active resampling and re-weighting techniques to balance skewed datasets.
-- **📊 Interactive Dashboard:** A modern, dark-mode platform built with FastAPI and Premium UI components for real-time monitoring.
+Modern recruitment systems increasingly rely on machine learning models. However, these models often inherit **hidden biases from historical data**, leading to unfair hiring decisions based on factors like gender or background.
+
+Key challenges:
+- ❌ Lack of visibility into model bias  
+- ❌ Difficulty in interpreting AI decisions  
+- ❌ Complexity in mitigating bias without reducing accuracy  
+
+---
+
+## 🚀 Our Solution
+
+FairAI Studio provides a **complete fairness pipeline**:
+
+### 🔍 1. Bias Auditing
+- Computes fairness metrics:
+  - Disparate Impact (DI)
+  - Statistical Parity Difference (SPD)
+- Detects unfair treatment across demographic groups
+
+---
+
+### 🧠 2. Explainable AI (XAI)
+- Uses **SHAP (SHapley Additive Explanations)**  
+- Visualizes feature importance  
+- Detects hidden **proxy bias variables**
+
+---
+
+### ⚖️ 3. Bias Mitigation
+- Applies **reweighing and resampling techniques**  
+- Reduces bias while maintaining model accuracy  
+- Produces a **Fair Model**
+
+---
+
+### 🤖 4. Generative Fairness Insights (Google Gemini)
+- Converts complex fairness metrics into:
+  - Clear explanations  
+  - Actionable hiring recommendations  
+- Makes the system accessible to **non-technical users**
+
+---
+
+## 📊 Key Results
+
+| Metric | Biased Model | Fair Model |
+|------|------------|------------|
+| Disparate Impact | ~0.45 | ~1.00 |
+| Statistical Parity | -0.31 | ~0.00 |
+| Accuracy | ~85% | ~84% |
+
+✔ Achieved **~99% fairness improvement**  
+✔ Maintained strong predictive performance  
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Python (FastAPI)
-- **Machine Learning:** Scikit-Learn, Pandas, NumPy
-- **Explainability:** SHAP
-- **Visualization:** Matplotlib, Seaborn
-- **Frontend:** Modern Web UI (Member 4 Implementation)
+### 🔧 Backend
+- Python
+- FastAPI
+
+### 🤖 Machine Learning
+- Scikit-learn  
+- Pandas  
+- NumPy  
+
+### 📊 Explainability & Visualization
+- SHAP  
+- Matplotlib  
+
+### 🌐 Frontend
+- Interactive Dashboard (Custom UI)
+
+### ☁️ AI Integration
+- Google Gemini API (Gemini 2.5 Flash)  
+- Google GenAI SDK  
+
+### 🚀 Deployment
+- Docker (Cloud-ready)  
+- Hosted prototype:  
+👉 https://fair-ai-studio.onrender.com/
 
 ---
 
-## 👥 Collaborative Team Structure
-
-The project is divided into four expert modules:
-
-1. **Member 1 (Data & Model):** Baseline model training and data preprocessing.
-2. **Member 2 (Forensic Auditor):** Bias metrics and SHAP explainability analysis.
-3. **Member 3 (Fairness Engineer):** Implementing mitigation strategies and fair model retraining.
-4. **Member 4 (Platform Architect):** Web integration and interactive dashboard development.
+## 🧩 Architecture Overview
+<img width="1003" height="669" alt="image" src="https://github.com/user-attachments/assets/db575825-60e1-48d2-87b0-292312cc3a7a" />
 
 ---
 
-## 📈 Initial Audit Results
-*Current baseline model performance:*
-- **Disparate Impact:** 1.10
-- **Statistical Parity Difference:** 0.03
-- **Primary Drivers:** Professional Experience and Screening Scores.
+## 👥 Team Structure
+
+| Member | Role | Responsibility |
+|--------|------|----------------|
+| 👤 Athira V | Data Scientist | Data preprocessing & baseline model |
+| 👤 Fathima Mehrin V S | Forensic Auditor | Bias detection & SHAP explainability |
+| 👤 Anna T Jeby | Fairness Engineer | Bias mitigation & model optimization |
+| 👤 Esha Byju Nair | Platform Architect | Backend + UI integration |
 
 ---
 
-## 🛠️ Installation & Usage
+## 📂 Project Outputs
+
+- `biased_model.pkl` → Baseline model  
+- `cleaned_data.csv` → Processed dataset  
+- `predictions.csv` → Model predictions  
+- Fairness reports & visualizations  
+
+---
+
+## 🛠️ Installation & Setup
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/FathimaMehrinVS/fair-ai-studio.git
+
+cd fair-ai-studio
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the Audit (Member 2 Module)
-python bias_auditor.py
-```
+# Run backend
+uvicorn main:app --reload
+
+## 🎥 Demo
+
+👉 **Live Prototype:**  
+https://fair-ai-studio.onrender.com/
 
 ---
 
-*This project is part of a dedicated effort to promote Fairness and Transparency in AI.*
+## 🌍 Impact
+
+FairAI Studio aligns with:
+
+- 🌐 **UN SDG 10: Reduced Inequalities**  
+- 💼 **UN SDG 8: Decent Work and Economic Growth**
+
+By promoting fairness in hiring, it helps organizations:
+- build diverse teams  
+- reduce discrimination  
+- ensure ethical AI adoption  
+
+---
+
+## 🚀 Future Scope
+
+- Integration with real-world HR systems  
+- Support for multiple domains (e.g., loans, education)  
+- Advanced fairness metrics and auditing tools  
+
+---
+
+## 🧠 Key Innovation
+
+The core innovation is the **combination of fairness metrics + generative AI**:
+
+> Making ethical AI understandable, actionable, and accessible to everyone.
+
+---
+
+## 📜 License
+
+This project is developed for educational and research purposes under the Google Solution Challenge.

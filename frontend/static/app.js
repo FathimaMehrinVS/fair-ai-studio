@@ -421,7 +421,7 @@ function loadScenario(gender, age, edu, exp, score) {
   $('exp-val').textContent = exp;
   $('input-score').value = score;
   $('score-val').textContent = score + '.0';
-  $('predict-form').dispatchEvent(new Event('submit'));
+  $('predict-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 }
 
 /* ══════════════════════

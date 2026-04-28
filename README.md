@@ -132,7 +132,7 @@ pip install -r requirements.txt
 
 # Run backend
 uvicorn main:app --reload
-
+```
 ## 🎥 Demo
 
 👉 **Live Prototype:**  
